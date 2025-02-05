@@ -5,10 +5,11 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const mongoose = require("mongoose");
 const { Employee, WorkType, Work } = require("./schemas");
+const cors = require("cors");
 connectMongoose();
 
 app.use(express.json());
-
+app.use(cors());
 // Employee Endpoints
 app.get("/employees", async (req, res) => {
   const employees = await Employee.find();
