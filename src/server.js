@@ -29,29 +29,61 @@ app.patch("/employees/:id", async (req, res) => {
   res.json(employee);
 });
 
+app.delete("/employees/:id", async (req, res) => {
+  try {
+    const employee = await Employee.findById(req.params.id);
+    if (!employee) return res.status(404).json({ error: "Employee not found" });
+
+    await employee.deleteOne(); // This will now trigger the pre-hook
+    res.status(200).json({ message: "Employee deleted successfully" });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
 // WorkType Endpoints
-app.get("/worktypes", async (req, res) => {
+app.get("/work-types", async (req, res) => {
   const workTypes = await WorkType.find();
   res.json(workTypes);
 });
 
-app.post("/worktypes", async (req, res) => {
+app.post("/work-types", async (req, res) => {
   const workType = new WorkType(req.body);
   await workType.save();
   res.status(201).json(workType);
 });
 
-app.patch("/worktypes/:id", async (req, res) => {
+app.patch("/work-types/:id", async (req, res) => {
   const workType = await WorkType.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
   });
   res.json(workType);
 });
 
+app.delete("/work-types/:id", async (req, res) => {
+  try {
+    const workType = await WorkType.findById(req.params.id);
+    if (!workType)
+      return res.status(404).json({ error: "Work type not found" });
+
+    await workType.deleteOne(); // This will now trigger the pre-hook
+    res.status(200).json({ message: "Work type deleted successfully" });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
 // Work Endpoints
 app.get("/works", async (req, res) => {
   const works = await Work.find().populate("employees").populate("workType");
   res.json(works);
+});
+
+app.get("/works/:id", async (req, res) => {
+  const work = await Work.findById(req.params.id)
+    .populate("employees")
+    .populate("workType");
+  res.json(work);
 });
 
 app.post("/works", async (req, res) => {
@@ -65,6 +97,11 @@ app.patch("/works/:id", async (req, res) => {
     new: true,
   });
   res.json(work);
+});
+
+app.delete("/works/:id", async (req, res) => {
+  const work = await Work.findByIdAndDelete(req.params.id);
+  res.status(201).json(work);
 });
 
 appListen();
